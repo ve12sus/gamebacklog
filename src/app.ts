@@ -2,36 +2,49 @@ import express, {
   Application, Request, Response, NextFunction,
 } from 'express';
 import mongoose from 'mongoose';
-import User from './models/user';
+import User, { IUser } from './models/user';
 import Game from './models/games';
 
 const app : Application = express();
 const port = 3000;
 
+app.use(express.json());
+
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true, useUnifiedTopology: true }).then(
-  () => {},
-  () => {},
-);
+const connectDB = async () => {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/test',
+      { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('Mongodb connected...');
+  } catch (err) {
+    console.error('failed to connect to mongoose', err);
+    throw err;
+  }
+};
 
-app.post('/users', async (req: Request, res: Response) => {
+connectDB().catch((err) => { console.log('connect db failed', err); throw err; });
+
+app.post('/users', (req: Request, res: Response) => {
   // make a new user
-  const user = await User.create(req.body);
-  res.status(200).json(user);
-});
-
-app.get('/users/:id', (req: Request, res: Response) => {
-  // get a user by id
-  res.send(req.params.id);
+  const { email, password } = req.body as IUser;
+  console.log(email);
+  console.log(password);
+  const user: IUser = new User({
+    email, password,
+  });
+  user.save().then(savedUser => {
+    console.log(savedUser); res.status(200); res.send(savedUser);
+  },
+  err => { console.log(err); res.status(500); });
 });
 
 app.get('/users', (req: Request, res: Response) => {
   // get collection of users
-  const users = await User.find({}).exec();
-  res.json(users);
+  User.find({}).then(users => { console.log(users); res.status(200); res.send(users); },
+    err => { console.log(err); res.status(500); });
 });
 
-app.put('/users/:id', (req: Request, res: Response) => {
+/* app.put('/users/:id', (req: Request, res: Response) => {
   // edit a user
 });
 
@@ -51,7 +64,7 @@ app.put('/users/:id/games', (req: Request, res: Response) => {
 
 app.use('/', (req: Request, res: Response, next: NextFunction) => {
   res.send(req.query.hello);
-});
+}); */
 
 // Start server
 app.listen(port, () => console.log(`Server is listening on port ${port}!`));
