@@ -51,16 +51,20 @@ app.get('/users/:id', (req: Request, res: Response) => {
 });
 
 app.put('/users/:id', (req: Request, res: Response) => {
-  // edit a user
+  // updates a user
+  const { email, password } = req.body as IUser;
+  User.findByIdAndUpdate(req.params.id, { email, password }).then(updatedUser => {
+    res.json(updatedUser); res.status(200);
+  },
+  err => { console.log(err); res.status(500); });
 });
 
 app.delete('/users/:id', (req: Request, res: Response) => {
   // deletes a user
-});
-
-app.put('/users/:id', (req: Request, res: Response) => {
-  // updates a user
-
+  User.findByIdAndDelete(req.params.id).then(deletedUser => {
+    res.json(deletedUser); res.status(200);
+  },
+  err => { console.log(err); res.status(500); });
 });
 
 /* app.put('/users/:id/games', (req: Request, res: Response) => {
