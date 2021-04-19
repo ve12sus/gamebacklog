@@ -44,7 +44,13 @@ app.get('/users', (req: Request, res: Response) => {
     err => { console.log(err); res.status(500); });
 });
 
-/* app.put('/users/:id', (req: Request, res: Response) => {
+app.get('/users/:id', (req: Request, res: Response) => {
+  // gets a user
+  User.findById(req.params.id).then(foundUser => { res.json(foundUser); res.status(200); },
+    err => { console.log(err); res.status(500); });
+});
+
+app.put('/users/:id', (req: Request, res: Response) => {
   // edit a user
 });
 
@@ -52,13 +58,12 @@ app.delete('/users/:id', (req: Request, res: Response) => {
   // deletes a user
 });
 
-app.get('/users/:id/games', (req: Request, res: Response) => {
-  // get a list of user's games
-  const games = await User.find({}).populate("games").exec();
-  res.json(games);
+app.put('/users/:id', (req: Request, res: Response) => {
+  // updates a user
+
 });
 
-app.put('/users/:id/games', (req: Request, res: Response) => {
+/* app.put('/users/:id/games', (req: Request, res: Response) => {
   // updates a user's backlog of games
 });
 
