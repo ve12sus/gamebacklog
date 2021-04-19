@@ -67,13 +67,5 @@ app.delete('/users/:id', (req: Request, res: Response) => {
   err => { console.log(err); res.status(500); });
 });
 
-/* app.put('/users/:id/games', (req: Request, res: Response) => {
-  // updates a user's backlog of games
-});
-
-app.use('/', (req: Request, res: Response, next: NextFunction) => {
-  res.send(req.query.hello);
-}); */
-
 // Start server
 app.listen(port, () => console.log(`Server is listening on port ${port}!`));
