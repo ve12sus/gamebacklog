@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { IGame, GameSchema } from './games';
 
 /**
  * Interface to model the User Schema for TypeScript.
@@ -9,7 +10,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IUser extends Document {
   email: string;
   password: string;
-  backlog: [{ type : Schema.Types.ObjectId, ref: 'Game' }];
+  backlog: mongoose.Types.DocumentArray<IGame>;
 }
 
 const userSchema: Schema = new Schema({
@@ -22,7 +23,7 @@ const userSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  backlog: [Schema.Types.ObjectId],
+  backlog: [GameSchema],
 });
 
 // Export the model and return your IUser interface

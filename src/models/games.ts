@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 /**
  * Interface to model the Game Schema for TypeScript.
@@ -6,16 +6,15 @@ import mongoose, { Schema, Document } from 'mongoose';
  * @param progress:string
  */
 
-export interface IGame extends Document {
+export interface IGame extends mongoose.Types.EmbeddedDocument {
   name: string;
   progress: string;
 }
 
-const GameSchema: Schema = new Schema({
+export const GameSchema: Schema = new Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   progress: {
     type: String,
