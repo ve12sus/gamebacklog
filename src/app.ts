@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import passport from 'passport';
 import { BasicStrategy } from 'passport-http';
 import User, { IUser } from './models/user';
-import Game, { IGame } from './models/games';
+import { IGame } from './models/games';
 
 const app : Application = express();
 const port = 3000;
