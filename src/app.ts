@@ -3,11 +3,12 @@ import express, {
 } from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
+import OAuthServer from 'express-oauth-server';
 import { BasicStrategy } from 'passport-http';
 import User, { IUser } from './models/user';
 import { IGame } from './models/games';
 
-const app : Application = express();
+const app : OServer = express();
 const port = 3000;
 
 mongoose.set('useCreateIndex', true);
@@ -28,6 +29,15 @@ const connectDB = async () => {
 };
 
 connectDB().catch((err) => { console.log('connect db failed', err); throw err; });
+
+interface OServer extends Application {
+  oauth : OAuthServer;
+}
+app.oauth = new OAuthServer({
+  model: {model}, // See https://github.com/oauthjs/node-oauth2-server for specification
+});
+
+app.use(app.oauth.authorize());
 
 passport.use(new BasicStrategy(
   (email, password, done) => {
