@@ -3,20 +3,14 @@ import express, {
 } from 'express';
 import mongoose from 'mongoose';
 import passport from 'passport';
-import OAuthServer from 'express-oauth-server';
 import { BasicStrategy } from 'passport-http';
 import User, { IUser } from './models/user';
 import { IGame } from './models/games';
-
-const app : OServer = express();
-const port = 3000;
+import { signToken, verifySignature } from './jwt';
 
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 
-app.use(express.json());
-
-// Connect to MongoDB
 const connectDB = async () => {
   try {
     await mongoose.connect('mongodb://localhost:27017/test',
@@ -30,14 +24,10 @@ const connectDB = async () => {
 
 connectDB().catch((err) => { console.log('connect db failed', err); throw err; });
 
-interface OServer extends Application {
-  oauth : OAuthServer;
-}
-app.oauth = new OAuthServer({
-  model: {model}, // See https://github.com/oauthjs/node-oauth2-server for specification
-});
+const app = express();
+const port = 3000;
 
-app.use(app.oauth.authorize());
+app.use(express.json());
 
 passport.use(new BasicStrategy(
   (email, password, done) => {
@@ -67,6 +57,32 @@ app.get('/users', (req: Request, res: Response) => {
   // get collection of users
   User.find({}).then(users => { console.log(users); res.status(200); res.send(users); },
     err => { console.log(err); res.status(500); });
+});
+
+app.get('/token', passport.authenticate('basic', { session: false }), (req: Request, res: Response) => {
+  // returns a token
+  try {
+    const webToken = signToken();
+    res.send(webToken); res.status(200);
+  } catch {
+    res.send(500);
+  }
+});
+
+app.get('/protected', (req: Request, res: Response) => {
+  // resource protected by JWT
+  try {
+    const header = req.header('Authorization');
+    if (header) {
+      const token = header.replace('Bearer ', '');
+      if (verifySignature(token)) {
+        res.status(200);
+        res.send('secret information');
+      }
+    }
+  } catch {
+    res.send(500);
+  }
 });
 
 app.get('/users/:id', passport.authenticate('basic', { session: false }), (req: Request, res: Response) => {
